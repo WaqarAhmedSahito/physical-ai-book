@@ -1,0 +1,200 @@
+openapi: 3.0.3
+info:
+  title: OpenAI Agent with RAG Integration API
+  description: API for interacting with a retrieval-enabled AI agent
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Development server
+paths:
+  /query:
+    post:
+      summary: Submit a query to the AI agent
+      description: Process a user query through the RAG agent and return a grounded response
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+      responses:
+        '200':
+          description: Successful response from the agent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Check the health status of the service and its dependencies
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+components:
+  schemas:
+    QueryRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: The user's query text
+          example: "What is the main concept of embodied AI?"
+        thread_id:
+          type: string
+          description: Optional thread ID for conversation continuity
+          example: "thread_abc123"
+      example:
+        query: "What is the main concept of embodied AI?"
+        thread_id: "thread_abc123"
+
+    QueryResponse:
+      type: object
+      required:
+        - response_id
+        - query
+        - response
+        - sources
+        - processing_time_ms
+      properties:
+        response_id:
+          type: string
+          description: Unique identifier for this response
+          example: "resp_def456"
+        query:
+          type: string
+          description: The original query text
+          example: "What is the main concept of embodied AI?"
+        response:
+          type: string
+          description: The AI-generated response
+          example: "Embodied AI refers to artificial intelligence systems that interact with the physical world through sensors and actuators..."
+        sources:
+          type: array
+          description: List of sources used to generate the response
+          items:
+            $ref: '#/components/schemas/Source'
+        confidence:
+          type: number
+          format: float
+          description: Confidence score for the response (0.0-1.0)
+          example: 0.85
+        processing_time_ms:
+          type: integer
+          description: Time taken to process the query in milliseconds
+          example: 2450
+        metadata:
+          type: object
+          description: Additional metadata about the response
+          additionalProperties: true
+
+    Source:
+      type: object
+      required:
+        - chunk_id
+        - content_preview
+        - source_url
+        - similarity_score
+      properties:
+        chunk_id:
+          type: string
+          description: Unique identifier for the retrieved chunk
+          example: "chunk_789xyz"
+        content_preview:
+          type: string
+          description: Preview of the content that was used
+          example: "Embodied artificial intelligence (AI) refers to AI systems that..."
+        source_url:
+          type: string
+          description: URL where the content originated
+          example: "https://physical-ai-book-topaz.vercel.app/module-1/chapter-1"
+        section_title:
+          type: string
+          description: Title of the section where content appears
+          example: "Introduction to Embodied AI"
+        similarity_score:
+          type: number
+          format: float
+          description: Similarity score of this chunk to the query
+          example: 0.87
+        page_number:
+          type: integer
+          description: Page number in the original document
+          example: 15
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: "QUERY_PROCESSING_ERROR"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Failed to process query due to internal error"
+        details:
+          type: object
+          description: Additional error details
+          additionalProperties: true
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - timestamp
+      properties:
+        status:
+          type: string
+          description: Overall health status
+          enum: [healthy, degraded, unavailable]
+          example: "healthy"
+        timestamp:
+          type: string
+          format: date-time
+          description: When the health check was performed
+          example: "2025-12-22T10:30:00Z"
+        dependencies:
+          type: object
+          description: Health status of individual dependencies
+          properties:
+            openai_api:
+              type: string
+              enum: [healthy, degraded, unavailable]
+              example: "healthy"
+            qdrant:
+              type: string
+              enum: [healthy, degraded, unavailable]
+              example: "healthy"
+            processing_capacity:
+              type: string
+              enum: [healthy, degraded, unavailable]
+              example: "healthy"

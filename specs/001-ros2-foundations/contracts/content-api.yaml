@@ -1,0 +1,84 @@
+# API Contract: Documentation Content Access
+
+## Overview
+This contract defines the interface for accessing documentation content that will be used by the RAG chatbot system. This is forward-looking to support the integration of the documentation with the AI chatbot as specified in the project constitution.
+
+## Endpoints
+
+### GET /api/content/search
+**Purpose**: Search documentation content based on user queries
+
+**Request**:
+```
+GET /api/content/search?q={query}&module={moduleId}&limit={limit}
+```
+
+**Parameters**:
+- `q` (required): Search query string
+- `module` (optional): Module ID to limit search scope
+- `limit` (optional): Maximum number of results (default: 10)
+
+**Response**:
+```json
+{
+  "results": [
+    {
+      "id": "string",
+      "title": "string",
+      "content_snippet": "string",
+      "url": "string",
+      "module": "string",
+      "relevance_score": "number"
+    }
+  ],
+  "total_results": "number"
+}
+```
+
+### GET /api/content/{module}/{chapter}
+**Purpose**: Retrieve specific chapter content
+
+**Request**:
+```
+GET /api/content/{module}/{chapter}
+```
+
+**Path Parameters**:
+- `module`: Module identifier (e.g., "module-1")
+- `chapter`: Chapter identifier (e.g., "chapter-1")
+
+**Response**:
+```json
+{
+  "id": "string",
+  "title": "string",
+  "content": "string",
+  "module": "string",
+  "previous_chapter": "string or null",
+  "next_chapter": "string or null",
+  "last_updated": "date"
+}
+```
+
+## Error Responses
+
+### 404 Not Found
+```json
+{
+  "error": "Content not found",
+  "details": "string"
+}
+```
+
+### 400 Bad Request
+```json
+{
+  "error": "Invalid parameters",
+  "details": "string"
+}
+```
+
+## Future Considerations
+- Integration with the RAG system for AI-powered search
+- Support for content selection and citation features
+- Analytics for content usage and user engagement

@@ -1,0 +1,27 @@
+[project]
+name = "rag-ingestion-pipeline"
+version = "0.1.0"
+description = "RAG content ingestion pipeline for extracting content from book URLs, generating embeddings using Cohere, and storing in Qdrant"
+authors = [{name = "AI Engineer", email = "engineer@example.com"}]
+readme = "README.md"
+requires-python = ">=3.11"
+
+dependencies = [
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.2",
+    "cohere>=4.9.0",
+    "qdrant-client>=1.9.0",
+    "python-dotenv>=1.0.0",
+    "lxml>=4.9.0",
+    "openai-agents>=0.6.4",
+]
+
+[tool.setuptools]
+py-modules = ["main"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+rag-ingest = "main:main"
