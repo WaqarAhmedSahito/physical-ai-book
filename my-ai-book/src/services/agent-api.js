@@ -1,5 +1,5 @@
 // API client for the RAG agent
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://waqar-d-backend.hf.space';
 
 export const agentApi = {
   // Query the RAG agent
